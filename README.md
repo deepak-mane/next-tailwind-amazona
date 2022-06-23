@@ -17,5 +17,12 @@
   3. show image in first column
   4. show product info in second column
   5. show add to cart action on third column
-  6. add styles 
+  6. add styles
+8. Handle Add To Cart
+  1. Define react context
+  2. Define cart items state
+  3. Create Add to Cart action
+  4. Add Reducer
+  5. Create store provider
+  6. handle add to cart button
 

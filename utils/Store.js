@@ -1,12 +1,13 @@
 import { createContext, useReducer } from 'react'
 import Cookies from 'js-cookie'
 
+
 export const Store = createContext()
 
 const initialState = {
   cart: Cookies.get('cart')
     ? JSON.parse(Cookies.get('cart'))
-    : { cartItems: [] }
+    : { cartItems: [], shippingAddress: {} }
 }
 
 function reducer(state, action) {
@@ -44,6 +45,19 @@ function reducer(state, action) {
             location: {}
           },
           paymentMethod: ''
+        }
+      }
+    }
+
+    case 'SAVE_SHIPPING_ADDRESS': {
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          shippingAddress: {
+            ...state.cart.shippingAddress,
+            ...action.payload
+          }
         }
       }
     }

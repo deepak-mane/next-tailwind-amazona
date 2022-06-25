@@ -1,17 +1,43 @@
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
 import Layout from '../components/Layout'
 import { useForm } from 'react-hook-form'
+import { getError } from '../utils/error'
+import { toast } from 'react-toastify'
+import { useRouter } from 'next/router'
+
 
 export default function LoginScreen() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const { redirect } = router.query
+
+  useEffect(() => {
+    if (session?.user) {
+      router.push(redirect || '/')
+    }
+  }, [router, session, redirect])
+
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm()
 
-  const submitHandler = ({ email, password }) => {
-    console.log('email : ', email, 'password : ', password);
+  const submitHandler = async ({ email, password }) => {
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password
+      })
+      if (result.error) {
+        toast.error(result.error)
+      }
+    } catch (err) {
+      toast.error(getError(err))
+    }
   }
   return (
     <Layout title='Login'>
@@ -43,17 +69,22 @@ export default function LoginScreen() {
         <div className='mb-4'>
           <label htmlFor='password'>Password</label>
           <input
-          {...register('password', {
-            required: 'Please enter password',
-            minLength: { value: 6 , message: 'Password is more than 5 chars'},
-          })}
+            {...register('password', {
+              required: 'Please enter password',
+              minLength: {
+                value: 6,
+                message: 'Password is more than 5 chars'
+              }
+            })}
             type='password'
             className='w-full'
             id='password'
             autoFocus
           ></input>
           {errors.password && (
-            <div className='text-red-500'>{errors.password.message}</div>
+            <div className='text-red-500'>
+              {errors.password.message}
+            </div>
           )}
         </div>
         <div className='mb-4'>
